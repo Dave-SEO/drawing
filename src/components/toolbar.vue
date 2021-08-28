@@ -1,6 +1,7 @@
 <template>
     <div class="toolbar"> 
-         <ColorPicker :visible='true' @change="methods.changeColorLine"/>
+         <LineTools />
+         <ColorPicker :visible='false' @change="methods.changeColorLine"/>
     </div>
 </template>
 
@@ -8,11 +9,11 @@
 import {defineComponent, reactive, toRefs} from 'vue'
 import {ElColorPicker, ElPopover, ElButton} from 'element-plus'
 import ColorPicker, {ColorPorps} from './ColorPicker.vue'
-
+import LineTools from './LineTools.vue'
 export default defineComponent({
   name: 'toobar',
   components:{
-      ElColorPicker, ElPopover, ElButton, ColorPicker
+      ElColorPicker, ElPopover, ElButton, ColorPicker, LineTools
   },
   props: {
   },
@@ -40,6 +41,8 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .toolbar{
+    display: flex;
+    align-items: center;
     position: relative;
     padding-left: 35px;
     background-color: #f3f3f3;
@@ -57,4 +60,5 @@ export default defineComponent({
     z-index: 1;
     box-sizing: content-box;;
 }
+
 </style>
