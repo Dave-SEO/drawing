@@ -1,17 +1,20 @@
 <template>
     <!-- :colors-default="predefineColors" -->
-      <ColorPicker
-        v-if="visible"
-        class="picker"
-        theme="light"
-        :color="color"
-        @changeColor="changeColor"
+     <div>
+        <ColorPicker
+          v-show="visible"
+          class="picker"
+          theme="light"
+          :color="color"
+          @changeColor="changeColor"
     />
+     </div>
 </template>
 
 <script lang='ts'>
-import {defineComponent, reactive, toRefs} from 'vue'
+import {defineComponent, onMounted, onUnmounted, reactive, toRefs, nextTick, watch} from 'vue'
 import { ColorPicker } from 'vue-color-kit'
+import {Tools} from '@/enum'
 import 'vue-color-kit/dist/vue-color-kit.css'
 export type ColorPorps = {
   hex: string,
@@ -47,9 +50,13 @@ export default defineComponent({
     visible: {
         type: Boolean,
         required: false
+    },
+    handlerVisible: {
+      type: Function,
+      required: false
     }
   },
-  setup({}, {emit}) { 
+  setup(props, {emit}) { 
    const state = reactive({ 
         color: '#59c7f9',
         suckerCanvas: null,
@@ -57,12 +64,51 @@ export default defineComponent({
         isSucking: false,
         predefineColors
     })
-    
+   
+   /**
+    * @description 画板打开需要监听document点击事件，.lf-tool-overlay svg画布有pointerEvents属性阻止点击事件，会使监听失效，
+    * 画板打开pointerEvents = 'all'，画板关闭恢复正常
+    */
+   watch([() => props.visible], () => {
+     if(props.visible){
+      (document.querySelector('.lf-tool-overlay') as HTMLElement).style.pointerEvents = 'all'
+     }else{
+      (document.querySelector('.lf-tool-overlay') as HTMLElement).style.pointerEvents = 'none'
+     }
+   })
+   
     const methods = {
        changeColor(color: ColorPorps) {
         emit('change', color)
+        // props.handlerVisible && props.handlerVisible(false)
+      },
+      outClickOffset(){
+        // 判断当前点击的元素是否在某个元素内部
+        const handler = (e: MouseEvent, el: HTMLElement | null ) => {
+             console.log('e.target', e.target)
+          if(el){
+            // 当前点击的元素是否是icon的父元素Button
+            const parentId = (e.target as HTMLElement).parentElement?.id
+            const isParentId = parentId === Tools.LineTools || parentId === Tools.TextTools ||  parentId === Tools.FillTools
+            console.log('isParentId', isParentId)
+         
+            if(!isParentId){
+              if(!el.contains(e.target as HTMLElement)){
+                props.handlerVisible && props.handlerVisible(false)
+              }
+            }
+          }
+        }
+
+         onMounted(() => nextTick(() => {
+            document.addEventListener('click', (e) => handler(e, document.querySelector('.picker')))
+          }))
+        onUnmounted(() => document.removeEventListener('click', () => handler))
       }
     }
+
+    methods.outClickOffset()
+  
     return { 
       ...toRefs(state),
       ...methods
@@ -73,7 +119,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .picker{
-    position: relative;
+    position: absolute;
     z-index: 1;
     box-sizing: content-box;;
 }

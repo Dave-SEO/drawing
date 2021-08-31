@@ -1,6 +1,6 @@
 <template>
-    <el-tooltip class="item" effect="dark" content="线条颜色" placement="bottom">
-      <el-button type="text" class="iconfont bg" :id="Tools.LineTools" :style="{'border-bottom-color': color}" icon="icon-bi" @click="methods.clickHandler"></el-button>
+    <el-tooltip class="item" effect="dark" content="文本颜色" placement="bottom">
+      <el-button type="text" class="iconfont bg" :id="Tools.TextTools" :style="{'border-bottom-color': color}" icon="icon-shezhilan_wenbenyanse" @click="methods.clickHandler"></el-button>
     </el-tooltip>
 </template>
 
@@ -12,7 +12,7 @@ import {Tools} from '@/enum'
  * @description 线条颜色工具
  */
 export default defineComponent({
-  name: Tools.LineTools,
+  name: Tools.TextTools,
   components:{
       ElTooltip, ElButton
   },
@@ -32,7 +32,7 @@ export default defineComponent({
 
     const methods = {
         clickHandler(){
-           emit('change', Tools.LineTools)
+            emit('change', Tools.TextTools)
         }
     }
     return { 
@@ -46,6 +46,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .bg{
+    font-size: 20px;
     color: #333;
     @include tools-bg();
     border-bottom: 2px solid #333;

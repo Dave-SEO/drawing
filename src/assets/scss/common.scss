@@ -2,6 +2,8 @@
 @mixin border-bottom {
     position: relative;
     &::after{
+        position: absolute;
+        bottom: 0;
         display: block;
         content: " ";
         width: 20px;
@@ -26,6 +28,7 @@
     position: relative;
     cursor: pointer;
     min-height: inherit;
+    margin-right: 10px;
     &:hover{
         border-color: #c6c6c6;
         box-shadow: 0px 1px 1px rgb(0 0 0 / 10%);
