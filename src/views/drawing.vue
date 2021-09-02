@@ -4,7 +4,7 @@
           <Button @click="methods.download" class="btn">下载图片</Button>
           <Button @click="methods.bpmnHandler" class="btn">查看数据</Button>
       </header>
-       <Toolbar />
+       <Toolbar :clickTypeAndData='clickTypeAndData'/>
       
 
       <div class="container-main">
@@ -40,6 +40,7 @@ import * as LogicFlowConfig from '../config'
 import {Button} from 'ant-design-vue'
 import Toolbar from '@/components/toolbar.vue'
 import {registerDownload} from '../node/bingxing'
+import { save } from '../config';
 LogicFlow.use(Control);
 LogicFlow.use(Menu);
 LogicFlow.use(DndPanel);
@@ -49,14 +50,21 @@ LogicFlow.use(Snapshot);
 NodeResize.step = 4;
 LogicFlow.use(NodeResize);
 
+export type clickTypeAndDataProps = {
+        type: ClickTypeProps,
+        id: string | '',
+        lf:  null | LogicFlow
+    }
 
 interface StateProps {
     logicFlowInstance: null | LogicFlow;
     clickNodeId: string;
     clickEdgeId: string;
     isvisible: boolean;
-    getGraphData: null | {[key: string]: any}
+    getGraphData: null | {[key: string]: any},
+    clickTypeAndData: clickTypeAndDataProps
 }
+type ClickTypeProps = 'line' | 'node' | ''
 type shapeProps = {type: string, text: string, class: string}
 export default defineComponent({
   name: 'logicFlow',
@@ -75,7 +83,12 @@ export default defineComponent({
        clickNodeId: '',
        clickEdgeId: '',
        isvisible: false,
-       getGraphData: null
+       getGraphData: null,
+       clickTypeAndData: {
+           type: '',
+           id: '',
+           lf: null
+       }
     })
 
     const methods = {
@@ -101,7 +114,6 @@ export default defineComponent({
                 },
                 metaKeyMultipleSelected: true  // 是否开启功能键按住多选
             });
-
              // 右键保存
              LogicFlowConfig.save(lf)
             
@@ -113,6 +125,8 @@ export default defineComponent({
              // LogicFlowConfig.setPatternItems(lf)
             lf.render(data);
 
+            methods.monitorEvent();
+            lf.setProperties('', {})
             // 开启多选模式
             lf.updateEditConfig({
                 stopMoveGraph: true
@@ -217,6 +231,28 @@ export default defineComponent({
          */
         redo(){
             state.logicFlowInstance?.redo()
+        },
+        /**
+         * 事件监听
+         */
+        monitorEvent(){
+             //点击节点将 节点ID记录下来
+             state.logicFlowInstance?.on('element:click', (callback) => {
+                 console.log('callback', callback)
+                 state.clickTypeAndData.type = ''
+                 state.clickTypeAndData.id = ''
+                 state.clickTypeAndData.lf = state.logicFlowInstance
+              
+                  //有连线起始节点的id 说明是线
+                 if(callback.data.sourceNodeId){
+                     state.clickTypeAndData.type = 'line'
+                     state.clickTypeAndData.id = callback.data.id
+                 }else{
+                     // 是节点
+                    state.clickTypeAndData.type = 'node'
+                    state.clickTypeAndData.id = callback.data.id
+                 }
+             })
         }
     }
      

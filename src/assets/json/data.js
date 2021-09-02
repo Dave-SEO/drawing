@@ -14,6 +14,12 @@ export const data = {
         x: 300,
         y: 150,
       },
+      {type: 'diamond-b', 
+      text: '并行分支',
+      class:'node-rect icon-binghang-1',
+      x: 400,
+      y: 150,
+    }
     ],
     // 边
     edges: [

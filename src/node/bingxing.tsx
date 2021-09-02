@@ -1,11 +1,12 @@
 import LogicFlow from '@logicflow/core'
-
+import { RectNode, RectNodeModel, BaseNodeModel } from '@logicflow/core'
 const NODE_COLOR = '#000'
+
 export const registerDownload = (lf: LogicFlow) => {
     lf.register('diamond-b', ({PolygonNode, PolygonNodeModel, h}) => {
         class View extends PolygonNode{
             getIconShape () {
-                const {width, height} = this.getAttributes()
+                const {width, height, properties: {lineColor}} = this.getAttributes()
                 const iconHeight = 30
                 return  h(
                     'svg',
@@ -19,7 +20,8 @@ export const registerDownload = (lf: LogicFlow) => {
                     h(
                         'path',
                         {
-                            fill:NODE_COLOR,
+                            stroke: 'purple',
+                            fill: lineColor || NODE_COLOR,
                             d: "M865.72687752 474.25069304h-320.7593876v-311.18469631c0-14.36237715-14.36237715-33.51218498-33.51218498-33.51218498-19.14980785 0-33.51218498 19.14980785-33.51218498 38.29961567v311.18469632H166.75740297c-19.14980785-4.78745622-38.29961567 14.36237715-38.29961568 33.51218498s19.14980785 33.51218498 33.51218499 33.51218498h311.18469632v311.18469632c4.78745622 19.14980785 19.14980785 38.29961567 38.29961567 38.29961568s33.51218498-19.14980785 33.51218498-33.51218498v-315.97246724h315.97246725c19.14980785 0 33.51218498-19.14980785 33.51218498-33.51218498s-9.57494645-38.29961567-28.7247543-38.29961567Z"
                         }
                     )
@@ -37,13 +39,11 @@ export const registerDownload = (lf: LogicFlow) => {
                       strokeWidth,
                       stroke,
                       strokeOpacity,
-                      points
+                      points,
+                      properties: {lineColor, fillColor}
                     } = attributes
                     const transform = `matrix(1 0 0 1 ${x - width / 2} ${y - height / 2})`
                     const pointsPath = points.map(point => point.join(',')).join(' ')
-                    console.log('pointsPath',  x, y)
-                    console.log('width', width,height)
-
                     return h(
                       'g',
                       {
@@ -54,8 +54,8 @@ export const registerDownload = (lf: LogicFlow) => {
                           'polygon',
                           {
                             points: pointsPath,
-                            fill,
-                            stroke,
+                            fill: fillColor || fill,
+                            stroke: lineColor || stroke,
                             strokeWidth,
                             strokeOpacity,
                             fillOpacity

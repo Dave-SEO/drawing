@@ -8,21 +8,25 @@
 </template>
 
 <script lang='ts'>
-import {defineComponent, reactive, toRefs} from 'vue'
+import {defineComponent, PropType, reactive, toRefs} from 'vue'
 import {ElColorPicker, ElPopover, ElButton} from 'element-plus'
 import ColorPicker, {ColorPorps} from './ColorPicker.vue'
 import LineTools from './LineTools.vue'
 import TextTools from './TextTools.vue'
 import FillTools from './FillTools.vue'
 import {Tools} from '@/enum'
+import {clickTypeAndDataProps} from '@/views/drawing.vue'
 export default defineComponent({
   name: 'toobar',
   components:{
       ElColorPicker, ElPopover, ElButton, ColorPicker, LineTools, TextTools, FillTools
   },
   props: {
+      clickTypeAndData: {
+          type: Object as PropType<clickTypeAndDataProps>
+      }
   },
-  setup({}, {emit}) { 
+  setup(props, {emit}) { 
    const state = reactive({
        toolsType: '',
        visible: false,
@@ -37,21 +41,33 @@ export default defineComponent({
          * @param color 色值
          */
       changeColorLine(color: ColorPorps){
-          console.log(color.hex)
           switch (state.toolsType) {
               case Tools.LineTools:
                   state.lineToolsColor = color.hex
+                  methods.setProperties({
+                      lineColor: color.hex
+                  })
                   break;
               case Tools.TextTools:
                    state.textToolsColor = color.hex
+                   methods.setProperties({
+                        textColor: color.hex
+                    })
                   break;
               case Tools.FillTools:
                   state.fillToolsColor = color.hex
+                  methods.setProperties({
+                    fillColor: color.hex
+                  })
                   break;
               default:
                   break;
           }
       },
+      /**
+       * @description 点击工具时触发
+       * @param name 点击的是哪个工具
+       */
       changeTools(name: string){
           state.visible = true;
           state.toolsType = name;
@@ -68,6 +84,9 @@ export default defineComponent({
       },
       handlerVisible(){
           state.visible = false
+      },
+      setProperties(properties: Object){
+        props.clickTypeAndData?.lf?.setProperties(props.clickTypeAndData?.id, properties)
       }
     }
     return { 
